@@ -1,26 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 int main()
 {
-    srand(time(NULL));
+    int binary;
+    int weight;
+    int decimal;
+    int rem;
+    int num;
 
+    printf("Enter the binary number: ");
+    scanf("%d",&binary);
+    decimal = 0;
+    weight = 1;
+    num = binary;
 
-    int number = (rand() % 100) +1;
-    int guess = 0 ;
-    do
+    while(binary!=0)
     {
-        printf("Enter a guess: \n");
-        scanf("%d",&guess);
-
-        if (guess == number)
-            printf("You got it:\')\'");
-        else if (guess < number)
-            printf("guess higher");
-        else
-            printf("Guess lower");
+        rem = binary % 10;
+        decimal = decimal + rem*weight;
+        binary = binary / 10;
+        weight = weight*2;
     }
-    while (guess != number);
+    printf("Decimal equivalent of the binary number %d is: %d", num, decimal );
+
     return 0;
 }
