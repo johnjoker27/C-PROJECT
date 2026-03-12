@@ -1,0 +1,99 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+float sqArea( float length)
+{
+    float area = length*length;
+    return area;
+}
+
+
+float circArea(float rad)
+{
+    float circarea = 3.142*rad*rad;
+    return circarea;
+}
+
+
+float triArea(float base,float height)
+{
+    float triarea = 0.5*base*height;
+    return triarea;
+}
+
+
+float recArea(float length , float breadth)
+{
+    float recarea = length * breadth;
+    return recarea;
+}
+
+int main()
+{
+    float calcSq = sqArea(45);
+    printf("The area of the square is %f\n",calcSq);
+
+    float calcCirc = circArea(56);
+    printf("the area of the circle is %f\n",calcCirc);
+
+    float calcTri = triArea(75,85);
+    printf("Area of the triangle is %f\n",calcTri);
+
+    float calcRec = recArea(56,76);
+    printf("Area of the rectangle is %f\n",calcRec);
+
+    printf("Shape 1\n It contains a semi-cirlce and a rectangle.\n");
+    float area1 = circArea(4)/2 + recArea(12,8);
+    printf("Area of shape 1 = %.2f ft \n\n",area1);
+
+    printf("shape 2\n it contains a rectangle and triangle.\n");
+    float area2 = recArea(13,8) + triArea(8,6);
+    printf("Area of shpae 2 = %.2f ft \n\n",area2);
+
+    printf("shape 3\n It contains a square and a rectangle.\n");
+    float area3 = recArea(11,4) + sqArea(5);
+    printf("Area of shape 3 = %.2f ft\n\n",area3);
+
+    printf("shape 4\n It contains a semi circle and a triangle\n");
+    float area4 = circArea(4)/2 + triArea(8,7);
+    printf("Area of shape 4 = %.2f ft\n\n",area4);
+
+
+    printf("shape 5\n It contains a square and a triangle\n");
+    float area5 = sqArea(7) + triArea(7,4);
+    printf("Area of shape 5 = %.2f ft\n\n",area5);
+
+    printf("shape 6\n It contains a square and a rectangle\n");
+    float area6 = recArea(12,6) +sqArea(6);
+    printf("Area of shape 6 = %.2f ft\n\n",area6);
+
+    printf("shape 7\n It contains a rectangle ,semi circle and a right angle triangle\n");
+    float area7 = recArea(13,12) + triArea(13,12) + circArea(9)/2;
+    printf("Area of shape 7 = %.2f ft\n\n",area7);
+
+    printf("shape 9\n It contains a circle with a triangle removed.\n");
+    float area9 = circArea(6) - triArea(12,6);
+    printf("Area of shape 9 = %.2f ft\n\n",area9);
+
+    printf("shape 8\n It contains a rectangle with  triangles removed.\n");
+    float area8 = recArea(19,15)- triArea(19,7);
+    printf("Area of shape 8 = %.2f ft\n\n",area8);
+
+    printf("shape 10\n It contains a folded rectangle\n");
+    float area10 = recArea(16,11);
+    printf("Area of shape 10 = %.2f ft\n\n",area10);
+
+    printf("shape 11\n It contains a rectangle and a semi-circle\n");
+    float area11 = recArea(22,13) + circArea(11)/2;
+    printf("Area of shape 11 = %.2f ft\n\n",area11);
+
+    printf("shape 12\n It contains rectangle with a right angle triangle removed.\n");
+    float area12 = recArea(26,17) - triArea(14,17);
+    printf("Area of shape 12 = %.2f ft\n\n",area12);
+
+
+
+    return 0;
+
+}
