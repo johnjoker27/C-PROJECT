@@ -1,192 +1,145 @@
-
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
-#include <time.h>
+#include <stdbool.h>
 
-typedef enum
-{
-    PLAYER_X,
-    PLAYER_O
-} player;
+#define SIZE 3
 
-void print_grid();
-void swap_player();
-bool check_tie();
-bool check_rows();
-bool check_columns();
-bool check_diagonals();
-bool check_winner();
-void computer_move();
+char board[SIZE][SIZE];
+char player = 'X';
+char ai = 'O';
 
-char GRID[3][3] =
-{
-    {'-','-','-'},
-    {'-','-','-'},
-    {'-','-','-'}
-};
-
-player CURRENT_PLAYER = PLAYER_X;
-bool vs_computer = false;
-
-int main()
-{
-    srand(time(NULL));
-
-
-    int mode = 1;
-    printf("Choose mode:\n1. Player vs Player\n2. Player vs Computer\n");
-    scanf("%d", &mode);
-    if(mode == 2)
-    {
-        vs_computer = true;
+void initializeBoard() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            board[i][j] = ' ';
+        }
     }
-
-
-    bool game_running = true;
-
-    while(game_running)
-    {
-        int row, column;
-
-        printf("\n*************************************************************************\n\n");
-        print_grid();
-
-        if(vs_computer && CURRENT_PLAYER == PLAYER_O)
-        {
-            computer_move();
-
-            if(check_winner())
-            {
-                print_grid();
-                printf("\nWinner: Computer (O)\n");
-                game_running = false;
-                continue;
-            }
-
-            if(check_tie())
-            {
-                print_grid();
-                printf("\nTIE\n");
-                game_running = false;
-                continue;
-            }
-
-            swap_player();
-            continue;
-        }
-
-
-        printf("\nPlayer: %c\nPlease enter row column (1-3): ",
-               CURRENT_PLAYER == PLAYER_X ? 'X' : 'O');
-
-        if(scanf("%d %d", &row, &column) != 2)
-        {
-            printf("Invalid input!\n");
-            return 1;
-        }
-
-        if(row < 1 || row > 3 || column < 1 || column > 3)
-            continue;
-
-        if(GRID[row - 1][column - 1] != '-')
-        {
-            printf("That space is already taken\n");
-            continue;
-        }
-
-
-        GRID[row - 1][column - 1] =
-            CURRENT_PLAYER == PLAYER_X ? 'X' : 'O';
-
-
-        if(check_winner())
-        {
-            print_grid();
-            printf("\nWinner: %c\n",
-                   CURRENT_PLAYER == PLAYER_X ? 'X' : 'O');
-            game_running = false;
-            continue;
-        }
-
-
-        if(check_tie())
-        {
-            print_grid();
-            printf("\nTIE\n");
-            game_running = false;
-            continue;
-        }
-
-        swap_player();
-    }
-
-    return 0;
 }
 
-void print_grid()
-{
-    for(int i = 0; i < 3; i++)
-    {
-        for(int j = 0; j < 3; j++)
-            printf("%c ", GRID[i][j]);
+void printBoard() {
+    printf("\n");
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            printf(" %c ", board[i][j]);
+            if (j < SIZE - 1) printf("|\");
+        }
         printf("\n");
+        if (i < SIZE - 1) printf("---+---+---\n");
+    }
+    printf("\n");
+}
+
+bool isMovesLeft() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (board[i][j] == ' ') return true;
+        }
+    }
+    return false;
+}
+
+bool checkWin(char ch) {
+    // Check rows and columns
+    for (int i = 0; i < SIZE; i++) {
+        if ((board[i][0] == ch && board[i][1] == ch && board[i][2] == ch) ||
+            (board[0][i] == ch && board[1][i] == ch && board[2][i] == ch)) {
+            return true;
+        }
+    }
+    // Check diagonals
+    if ((board[0][0] == ch && board[1][1] == ch && board[2][2] == ch) ||
+        (board[0][2] == ch && board[1][1] == ch && board[2][0] == ch)) {
+        return true;
+    }
+    return false;
+}
+
+int minimax(int depth, bool isMax) {
+    if (checkWin(ai)) return 10 - depth;
+    if (checkWin(player)) return depth - 10;
+    if (!isMovesLeft()) return 0;
+
+    if (isMax) {
+        int best = -1000;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (board[i][j] == ' ') {
+                    board[i][j] = ai;
+                    best = fmax(best, minimax(depth + 1, !isMax));
+                    board[i][j] = ' ';
+                }
+            }
+        }
+        return best;
+    } else {
+        int best = 1000;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (board[i][j] == ' ') {
+                    board[i][j] = player;
+                    best = fmin(best, minimax(depth + 1, !isMax));
+                    board[i][j] = ' ';
+                }
+            }
+        }
+        return best;
     }
 }
 
-void swap_player()
-{
-    CURRENT_PLAYER = (CURRENT_PLAYER == PLAYER_X) ? PLAYER_O : PLAYER_X;
+void bestMove() {
+    int bestVal = -1000;
+    int row = -1, col = -1;
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (board[i][j] == ' ') {
+                board[i][j] = ai;
+                int moveVal = minimax(0, false);
+                board[i][j] = ' ';
+                if (moveVal > bestVal) {
+                    row = i;
+                    col = j;
+                    bestVal = moveVal;
+                }
+            }
+        }
+    }
+    board[row][col] = ai;
 }
 
-bool check_tie()
-{
-    for(int i = 0; i < 3; i++)
-        for(int j = 0; j < 3; j++)
-            if(GRID[i][j] == '-')
-                return false;
-    return true;
-}
-
-bool check_rows()
-{
-    for(int i = 0; i < 3; i++)
-        if(GRID[i][0] != '-' && GRID[i][0] == GRID[i][1] && GRID[i][1] == GRID[i][2])
-            return true;
-    return false;
-}
-
-bool check_columns()
-{
-    for(int i = 0; i < 3; i++)
-        if(GRID[0][i] != '-' && GRID[0][i] == GRID[1][i] && GRID[1][i] == GRID[2][i])
-            return true;
-    return false;
-}
-
-bool check_diagonals()
-{
-    if(GRID[0][0] != '-' && GRID[0][0] == GRID[1][1] && GRID[1][1] == GRID[2][2])
-        return true;
-    if(GRID[0][2] != '-' && GRID[0][2] == GRID[1][1] && GRID[1][1] == GRID[2][0])
-        return true;
-    return false;
-}
-
-bool check_winner()
-{
-    return check_rows() || check_columns() || check_diagonals();
-}
-
-void computer_move()
-{
+void playerMove() {
     int row, col;
-    do
-    {
-        row = rand() % 3;
-        col = rand() % 3;
-    } while(GRID[row][col] != '-');
+    while (true) {
+        printf("Enter row and column (0, 1, or 2) separated by space: ");
+        if (scanf("%d %d", &row, &col) != 2 || row < 0 || row >= SIZE || col < 0 || col >= SIZE || board[row][col] != ' ') {
+            printf("Invalid input. Please try again.\n");
+            while (getchar() != '\n'); // clear the buffer
+        } else {
+            break;
+        }
+    }
+    board[row][col] = player;
+}
 
-    GRID[row][col] = 'O';
-    printf("Computer chooses: %d %d\n", row + 1, col + 1);
+int main() {
+    initializeBoard();
+    printf("Tic-Tac-Toe Game\n");
+    while (isMovesLeft()) {
+        printBoard();
+        playerMove();
+        if (checkWin(player)) {
+            printBoard();
+            printf("Player wins!\n");
+            return 0;
+        }
+        if (!isMovesLeft()) break;
+        bestMove();
+        if (checkWin(ai)) {
+            printBoard();
+            printf("AI wins!\n");
+            return 0;
+        }
+    }
+    printBoard();
+    printf("It's a draw!\n");
+    return 0;
 }
